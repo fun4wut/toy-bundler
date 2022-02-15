@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "skipDefaultLibCheck": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "declaration": true,
+    "noImplicitAny": true,
+    "target": "es6",
+    "module": "CommonJS",
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": "src",
+    "rootDir": "src",
+    "outDir": "dist",
+    "paths": {
+      "@src/*": ["./*"]
+    }
+  },
+  "exclude": ["node_modules"]
+}
