@@ -12,7 +12,8 @@ import pathUtils from 'path';
 export function transformToCjs(path: string) {
   const code = fse.readFileSync(path).toString();
   const res = transform(code, {
-    presets: ['env']
+    filename: 'x.ts',
+    presets: ['env', 'typescript']
   });
   return res.code || '';
 }
@@ -31,7 +32,7 @@ export function detectDependency(path: string, srcFilePath: string): Dependency 
   if (path.startsWith('./') || path.startsWith('../')) {
     return new RelativeDep(path, srcFilePath);
   }
-  if (path.startsWith('http')) {
+  if (path.startsWith('http://') || path.startsWith('https://')) {
     return new HttpDep(path, srcFilePath);
   }
   return new PackageDep(path, srcFilePath);
@@ -60,7 +61,7 @@ export function getPkgJson(path: string, pkgName: string) {
  * @returns 
  */
 export const resolveFileWithExt = (path: string): string | false => {
-  const exts = ['', '.js'];
+  const exts = ['', '.js', '.ts'];
   for (const ext of exts) {
     const pathWithExt = path + ext;
     if (fse.pathExistsSync(pathWithExt)) {

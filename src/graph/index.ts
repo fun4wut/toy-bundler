@@ -24,6 +24,7 @@ export class ModuleNode {
   }
   dumpFromTemplate = () => {
     return `
+      // ${this.filePath}
       ${this.id}: {
         factory: (module, exports, require) => {
           ${this.code}
