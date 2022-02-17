@@ -1,7 +1,10 @@
-import { ModuleGraph } from '@src/graph';
+import { ModuleGraph } from './graph';
+import { genOutputCode } from './runtime/template';
 
 const fileName = process.argv[2];
 
 const graph = new ModuleGraph(fileName);
 
-console.log(JSON.stringify(graph, null, 2));
+// console.log(graph)
+
+console.log(genOutputCode(graph.dumpFromTemplate()));

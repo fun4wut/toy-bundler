@@ -41,6 +41,11 @@ export function getPkgName(path: string) {
   return path.startsWith('@') ? pathUtils.join(first, second) : first;
 }
 
+/**
+ * 给定了绝对路径，再去查找他的带扩展名的路径
+ * @param path 
+ * @returns 
+ */
 export const resolveFileWithExt = (path: string): string | false => {
   const exts = ['', '.js'];
   for (const ext of exts) {

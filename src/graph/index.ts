@@ -23,32 +23,47 @@ export class ModuleNode {
   resolveDep = (path: string) => {
     return detectDependency(path, this.filePath);
   }
+  dumpFromTemplate = () => {
+    return `
+      ${this.id}: {
+        factory: (module, exports, require) => {
+          ${this.code}
+        },
+        map: ${JSON.stringify(this.depDict)}
+      }
+    `;
+  }
 }
 
 export class ModuleGraph {
-  graphArr: ModuleNode[] = [];
+  pathToModule: Map<string, ModuleNode> = new Map();
   constructor(entry: string) {
     const entryNode = new ModuleNode(entry);
-    const visDep = new Set<string>();
-    this.graphArr.push(entryNode);
-    visDep.add(entryNode.filePath);
+    this.pathToModule.set(entryNode.filePath, entryNode);
 
-    for (const mod of this.graphArr) {
+    for (const mod of this.pathToModule.values()) {
       mod.deps.forEach(d => {
         const { absPath, canBundle } = mod.resolveDep(d);
         if (!canBundle) { // node 基础库，直接require
           mod.depDict[d] = DIRECT_REQUIRE;
           return;
         }
-        // 如果该文件已经加入过依赖图了，直接跳过
-        if (visDep.has(absPath)) {
+        // 如果该文件已经加入过依赖图了，处理下依赖映射即可，直接跳过
+        if (this.pathToModule.has(absPath)) {
+          mod.depDict[d] = this.pathToModule.get(absPath)!.id;
           return;
         }
-        visDep.add(absPath);
         const depNode = new ModuleNode(absPath);
-        this.graphArr.push(depNode);
+        this.pathToModule.set(absPath, depNode);
         mod.depDict[d] = depNode.id;
       });
     }
+  }
+  dumpFromTemplate = () => {
+    return `
+      {
+        ${[...this.pathToModule.values()].map(m => m.dumpFromTemplate()).join(',')}
+      }
+    `;
   }
 }
