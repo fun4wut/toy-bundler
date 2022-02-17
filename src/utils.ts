@@ -1,9 +1,8 @@
 import { transform } from '@babel/standalone';
 import fse from 'fs-extra';
 import detect from 'detective';
-import { DepType } from './types';
+import { Dependency, HttpDep, PackageDep, RelativeDep } from './dependency';
 import pathUtils from 'path';
-import findPkg from 'find-package-json';
 
 /**
  * 把文件转成cjs格式
@@ -27,22 +26,32 @@ export function getDeps(code: string) {
   return originalDeps;
 }
 
-export function detectDepType(path: string) {
+export function detectDependency(path: string, srcFilePath: string): Dependency {
   if (path.startsWith('./') || path.startsWith('../')) {
-    return DepType.Relative;
+    return new RelativeDep(path, srcFilePath);
   }
   if (path.startsWith('http')) {
-    return DepType.Http;
+    return new HttpDep(path, srcFilePath);
   }
-  return DepType.Package;
+  return new PackageDep(path, srcFilePath);
 }
 
-export const isFile = (path: string) => {
-  try {
-    return fse.statSync(path).isFile;
-  } catch {
-    return false;
+export function getPkgName(path: string) {
+  const [first, second, ..._] = path.split(pathUtils.sep);
+  return path.startsWith('@') ? pathUtils.join(first, second) : first;
+}
+
+export const resolveFileWithExt = (path: string): string | false => {
+  const exts = ['', '.js'];
+  for (const ext of exts) {
+    try {
+      const pathWithExt = pathUtils.join(path, ext);
+      return fse.statSync(pathWithExt).isFile() && pathWithExt;
+    } catch {
+      continue;
+    }
   }
+  return false;
 }
 
 /**
@@ -51,38 +60,12 @@ export const isFile = (path: string) => {
  * @returns 
  */
 export function resolveExactFile(path: string): string | false {
-  if (isFile(path)) {
-    return path;
-  }
-  let newPath
-  if (isFile((newPath = pathUtils.join(path, 'index.js')))) {
+  let newPath;
+  if (newPath = resolveFileWithExt(path)) {
     return newPath;
   }
-  return false;
-}
-
-/**
- * 根据目录，查找出该pkg的具体路径，查找失败则返回false
- * 需要处理：
- * 1. lodash
- * 2. lodash/dist/add
- * 3. 
- * @param path 目录绝对路径
- * @returns 
- */
- export function resolveExactPkg(path: string): string | false {
-  if (isFile(path)) {
-    return path;
-  }
-  for (const f of findPkg(path)) {
-      // 根据包名和目录名是否匹配来进行查找
-      if (f.name !== pathUtils.basename(path)) {
-        continue;
-      }
-      const dirname = pathUtils.dirname(f.__path);
-      // 拼出pkg的入口，然后再找对应的文件
-      const entryPath = pathUtils.join(dirname, f.main || 'index.js');
-      return entryPath;
+  if (newPath = resolveFileWithExt(pathUtils.join(path, 'index'))) {
+    return newPath;
   }
   return false;
 }
