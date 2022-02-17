@@ -9,7 +9,6 @@ export class ModuleNode {
   /** 绝对路径 */
   filePath: string;
   ext: string;
-  loaded: boolean = false;
   code: string;
   deps: string[];
   depDict: Record<string, number> = {};

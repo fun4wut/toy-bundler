@@ -1,6 +1,4 @@
-const { ee } = require('./c.js')
-const rua = '2333';
-console.log(ee)
-module.exports = {
-  rua,
-}
+module.exports.test = 'B';
+const modA = require('./a');
+console.log( 'modB:', modA.test);
+module.exports.test = 'BB';

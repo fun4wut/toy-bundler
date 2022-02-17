@@ -49,11 +49,9 @@ export function getPkgName(path: string) {
 export const resolveFileWithExt = (path: string): string | false => {
   const exts = ['', '.js'];
   for (const ext of exts) {
-    try {
-      const pathWithExt = pathUtils.join(path, ext);
+    const pathWithExt = path + ext;
+    if (fse.pathExistsSync(pathWithExt)) {
       return fse.statSync(pathWithExt).isFile() && pathWithExt;
-    } catch {
-      continue;
     }
   }
   return false;

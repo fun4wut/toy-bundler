@@ -9,6 +9,10 @@ const __require =
   const resolveModule = (id) => {
     const { factory, map } = modules[id];
 
+    if (moduleCache[id]) {
+      return moduleCache[id].exports;
+    }
+
     const localModule = {
       exports: {},
       loaded: false,
@@ -17,9 +21,6 @@ const __require =
 
     const localRequire = (requireDeclarationName) => {
       const depId = map[requireDeclarationName];
-      if (moduleCache[depId] && moduleCache[depId].loaded) {
-        return moduleCache[depId].exports;
-      }
       return depId >= 0
         ? resolveModule(depId)
         : __require(requireDeclarationName);
