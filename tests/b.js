@@ -1,6 +1,6 @@
 const { ee } = require('./c.js')
-const rua = 233;
+const rua = '2333';
 console.log(ee)
-module.export = {
+module.exports = {
   rua,
 }

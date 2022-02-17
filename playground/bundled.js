@@ -5,19 +5,28 @@ const __require =
         throw new Error("gg");
       };
 (function (modules) {
+  const moduleCache = {};
   const resolveModule = (id) => {
     const { factory, map } = modules[id];
+
+    const localModule = {
+      exports: {},
+      loaded: false,
+    };
+    moduleCache[id] = localModule;
+
     const localRequire = (requireDeclarationName) => {
       const depId = map[requireDeclarationName];
+      if (moduleCache[depId] && moduleCache[depId].loaded) {
+        return moduleCache[depId].exports;
+      }
       return depId >= 0
         ? resolveModule(depId)
         : __require(requireDeclarationName);
     };
-    const localModule = {
-      exports: {},
-    };
 
     factory(localModule, localModule.exports, localRequire);
+    localModule.loaded = true;
     return localModule.exports;
   };
   const res = resolveModule(0);
@@ -51,9 +60,9 @@ const __require =
       var _require = require("./c.js"),
         ee = _require.ee;
 
-      var rua = 233;
+      var rua = "2333";
       console.log(ee);
-      module["export"] = {
+      module.exports = {
         rua: rua,
       };
     },
@@ -63,14 +72,11 @@ const __require =
     factory: (module, exports, require) => {
       "use strict";
 
-      var _require = require("./b.js"),
-        rua = _require.rua;
-
       module.exports = {
-        ac: rua + 1,
+        ac: "dada" + 1,
         ee: 111,
       };
     },
-    map: { "./b.js": 1 },
+    map: {},
   },
 });

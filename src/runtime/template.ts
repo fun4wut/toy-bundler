@@ -1,20 +1,29 @@
 export const genOutputCode = (modulesStr: string) => `
   const __require = typeof require !== 'undefined' ? require : () => { throw new Error('gg') };
   (function(modules) {
+    const moduleCache = {};
     const resolveModule = id => {
       const {
         factory,
         map
       } = modules[id];
-      const localRequire = requireDeclarationName => {
-        const depId = map[requireDeclarationName]
-        return depId >= 0 ? resolveModule(depId) : __require(requireDeclarationName)
-      };
+
       const localModule = {
-        exports: {}
+        exports: {},
+        loaded: false,
+      };
+      moduleCache[id] = localModule;
+
+      const localRequire = requireDeclarationName => {
+        const depId = map[requireDeclarationName];
+        if (moduleCache[depId] && moduleCache[depId].loaded) {
+          return moduleCache[depId].exports;
+        }
+        return depId >= 0 ? resolveModule(depId) : __require(requireDeclarationName)
       };
   
       factory(localModule, localModule.exports, localRequire);
+      localModule.loaded = true;
       return localModule.exports;
     }
     const res = resolveModule(0);
