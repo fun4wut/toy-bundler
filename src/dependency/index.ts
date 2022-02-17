@@ -4,14 +4,14 @@ import findPkg from 'find-package-json';
 
 
 export interface Dependency {
-  requiredPath: string;
+  declPath: string;
   absPath: string;
   canBundle: boolean;
 }
 
 export class RelativeDep implements Dependency {
-  constructor(public requiredPath: string, srcFilePath: string) {
-    const absDir = pathUtils.join(srcFilePath, '../', requiredPath); // /User/xxx/proj/src/utils
+  constructor(public declPath: string, srcFilePath: string) {
+    const absDir = pathUtils.join(srcFilePath, '../', declPath); // /User/xxx/proj/src/utils
     this.absPath = resolveExactFile(absDir) || '';
     this.canBundle = true;
   }
@@ -20,10 +20,10 @@ export class RelativeDep implements Dependency {
 }
 
 export class PackageDep implements Dependency {
-  constructor(public requiredPath: string, srcFilePath: string) {
-    this.pkgName = getPkgName(requiredPath);
+  constructor(public declPath: string, srcFilePath: string) {
+    this.pkgName = getPkgName(declPath);
     // relative('lodash', 'lodash/dist/index.js') => 'dist/index.js'，算出对应包名的相对路径
-    const relativeRefPath = pathUtils.relative(this.pkgName, this.requiredPath);
+    const relativeRefPath = pathUtils.relative(this.pkgName, this.declPath);
     for (const f of findPkg(srcFilePath)) {
       // 根据包名是否匹配来进行查找
       if (f.name !== this.pkgName) {
@@ -47,7 +47,7 @@ export class PackageDep implements Dependency {
 }
 
 export class HttpDep implements Dependency {
-  constructor(public requiredPath: string, srcFilePath: string) {}
+  constructor(public declPath: string, srcFilePath: string) {}
   canBundle: boolean;
   absPath: string;
 }
