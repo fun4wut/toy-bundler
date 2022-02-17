@@ -2,6 +2,7 @@ import { transform } from '@babel/standalone';
 import fse from 'fs-extra';
 import detect from 'detective';
 import { Dependency, HttpDep, PackageDep, RelativeDep } from './dependency';
+import findPkg from 'find-package-json';
 import pathUtils from 'path';
 
 /**
@@ -39,6 +40,18 @@ export function detectDependency(path: string, srcFilePath: string): Dependency 
 export function getPkgName(path: string) {
   const [first, second, ..._] = path.split(pathUtils.sep);
   return path.startsWith('@') ? pathUtils.join(first, second) : first;
+}
+
+
+export function getPkgJson(path: string, pkgName: string) {
+  // 只找最近的那一个
+  for (const f of findPkg(path)) {
+    if (f.name === pkgName) {
+      return f;
+    }
+    return null;
+  }
+  return null;
 }
 
 /**

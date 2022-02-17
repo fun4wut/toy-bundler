@@ -1,6 +1,5 @@
-import { getPkgName, resolveExactFile } from '@src/utils';
+import { getPkgJson, getPkgName, resolveExactFile } from '@src/utils';
 import pathUtils from 'path';
-import findPkg from 'find-package-json';
 
 
 export interface Dependency {
@@ -24,22 +23,24 @@ export class PackageDep implements Dependency {
     this.pkgName = getPkgName(declPath);
     // relative('lodash', 'lodash/dist/index.js') => 'dist/index.js'，算出对应包名的相对路径
     const relativeRefPath = pathUtils.relative(this.pkgName, this.declPath);
-    for (const f of findPkg(srcFilePath)) {
-      // 根据包名是否匹配来进行查找
-      if (f.name !== this.pkgName) {
+    
+    for (let curDir = srcFilePath; curDir !== '/'; curDir = pathUtils.dirname(curDir)) {
+      const pkgJson = getPkgJson(pathUtils.join(curDir, 'node_modules', this.pkgName), this.pkgName);
+      if (!pkgJson) {
         continue;
       }
       // 拼出pkg的目录，然后再找对应的文件
-      const pkgDir = pathUtils.dirname(f.__path);
+      const pkgDir = pathUtils.dirname(pkgJson.__path);
       // 直接require包名，遵循pkg.json的main字段
       if (relativeRefPath === '') {
-        this.absPath = resolveExactFile(pathUtils.join(pkgDir, f.main || 'index.js')) || '';
+        this.absPath = resolveExactFile(pathUtils.join(pkgDir, pkgJson.main || 'index.js')) || '';
       } else { // 非require包名的情况下，在pkg的目录下进行查找
         this.absPath = resolveExactFile(pathUtils.join(pkgDir, relativeRefPath)) || '';
       }
-      break;
+      this.canBundle = true;
+      return;
     }
-    this.canBundle = Boolean(this.absPath);
+    this.canBundle = false;
   }
   pkgName: string;
   absPath: string;

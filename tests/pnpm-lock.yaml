@@ -1,0 +1,27 @@
+lockfileVersion: 5.3
+
+specifiers:
+  is-odd: ^3.0.1
+  lodash: ^4.17.21
+
+dependencies:
+  is-odd: 3.0.1
+  lodash: 4.17.21
+
+packages:
+
+  /is-number/6.0.0:
+    resolution: {integrity: sha1-5tFa0x/CYoh8zPIXrl+TFvgbGZU=}
+    engines: {node: '>=0.10.0'}
+    dev: false
+
+  /is-odd/3.0.1:
+    resolution: {integrity: sha1-ZRAbrzcn1yi2b6YvUM2n8tOYlgE=}
+    engines: {node: '>=4'}
+    dependencies:
+      is-number: 6.0.0
+    dev: false
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false

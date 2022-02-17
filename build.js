@@ -16,6 +16,7 @@ esb
         }
       },
     },
+    sourcemap: true,
     external: ['fsevents'],
     target: ['node12'],
   })
