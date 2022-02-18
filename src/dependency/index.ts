@@ -12,7 +12,7 @@ export class RelativeDep implements Dependency {
   constructor(public declPath: string, srcFilePath: string) {
     const absDir = pathUtils.join(srcFilePath, '../', declPath); // /User/xxx/proj/src/utils
     this.absPath = resolveExactFile(absDir) || '';
-    this.canBundle = true;
+    this.canBundle = pathUtils.extname(this.absPath) !== '.node'; // 不打包.node原生文件
   }
   canBundle: boolean;
   absPath: string;

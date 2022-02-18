@@ -10,12 +10,19 @@ import pathUtils from 'path';
  * @param path 文件路径
  */
 export function transformToCjs(path: string) {
-  const code = fse.readFileSync(path).toString();
-  const res = transform(code, {
-    filename: 'x.ts',
-    presets: ['env', 'typescript']
-  });
-  return res.code || '';
+  try {
+    const code = fse.readFileSync(path).toString();
+    const res = transform(code, {
+      filename: 'x.ts',
+      sourceType: 'unambiguous',
+      presets: ['env', 'typescript'],
+      plugins: ['transform-runtime']
+    });
+    return res.code || '';
+  } catch (error) {
+    console.error('transform err', path, error);
+    return '';
+  }
 }
 
 /**

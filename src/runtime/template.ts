@@ -13,7 +13,7 @@ export const genOutputCode = (modulesStr: string) => `
          4. 通过这个 Module 实例来加载文件
          5. 返回这个 Module 实例的 exports
          ### 先放缓存,再加载文件 可以避免循环引用的死锁 ###
-       * /
+       */
       if (moduleCache[id]) {
         return moduleCache[id].exports;
       }

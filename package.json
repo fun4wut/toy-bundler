@@ -18,6 +18,7 @@
     "esbuild": "^0.14.21"
   },
   "dependencies": {
+    "@babel/plugin-transform-runtime": "^7.17.0",
     "@babel/preset-typescript": "^7.16.7",
     "@babel/standalone": "^7.17.2",
     "detective": "^5.2.0",
