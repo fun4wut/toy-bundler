@@ -1,9 +1,8 @@
-import { transform } from '@babel/standalone';
 import fse from 'fs-extra';
 import detect from 'detective';
 import { Dependency, HttpDep, PackageDep, RelativeDep } from './dependency';
-import findPkg from 'find-package-json';
 import pathUtils from 'path';
+import { transformSync } from 'esbuild';
 
 /**
  * 把文件转成cjs格式
@@ -12,11 +11,8 @@ import pathUtils from 'path';
 export function transformToCjs(path: string) {
   try {
     const code = fse.readFileSync(path).toString();
-    const res = transform(code, {
-      filename: 'x.ts',
-      sourceType: 'unambiguous',
-      presets: ['env', 'typescript'],
-      plugins: ['transform-runtime']
+    const res = transformSync(code, {
+      format: 'cjs',
     });
     return res.code || '';
   } catch (error) {
@@ -72,7 +68,9 @@ export const resolveFileWithExt = (path: string): string | false => {
   for (const ext of exts) {
     const pathWithExt = path + ext;
     if (fse.pathExistsSync(pathWithExt)) {
-      return fse.statSync(pathWithExt).isFile() && pathWithExt;
+      return fse.statSync(pathWithExt).isFile()
+        && pathUtils.extname(pathWithExt) !== '.node' // 不打包.node原生文件
+        && pathWithExt;
     }
   }
   return false;
