@@ -2,7 +2,7 @@ import { detectDependency, getDeps, transformToCjs } from '@src/utils';
 import pathUtils from 'path';
 
 let globalIdCounter = 0;
-// 标识为node std，直接require，不需要bundle
+// 外部模块，如node标准库，native文件，直接require，不需要bundle
 const DIRECT_REQUIRE = -19260817;
 export class ModuleNode {
   id: number;
@@ -44,7 +44,7 @@ export class ModuleGraph {
     for (const mod of this.pathToModule.values()) {
       mod.deps.forEach(d => {
         const { absPath, canBundle } = mod.resolveDep(d);
-        if (!canBundle) { // node 基础库，直接require
+        if (!canBundle) { // 无法打包进去的，直接require
           mod.depDict[d] = DIRECT_REQUIRE;
           return;
         }
