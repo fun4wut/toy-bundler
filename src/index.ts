@@ -7,4 +7,4 @@ const graph = new ModuleGraph(fileName);
 
 // console.log(graph)
 const res = genOutputCode(graph.dumpFromTemplate());
-fse.writeFileSync('./playground/rrr.js', res);
+fse.writeFileSync('./playground/bundled.js', res);
