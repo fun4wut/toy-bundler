@@ -1,4 +1,5 @@
-import { detectDependency, getDeps, transformToCjs } from '@src/utils';
+import type { Dependency } from '@src/bundler';
+import { getDeps, transformToCjs } from '@src/utils';
 import pathUtils from 'path';
 
 let globalIdCounter = 0;
@@ -19,9 +20,6 @@ export class ModuleNode {
     this.deps = getDeps(this.code);
     this.ext = pathUtils.extname(this.filePath);
   }
-  resolveDep = (path: string) => {
-    return detectDependency(path, this.filePath);
-  }
   dumpFromTemplate = () => {
     return `
       // ${this.filePath}
@@ -37,13 +35,14 @@ export class ModuleNode {
 
 export class ModuleGraph {
   pathToModule: Map<string, ModuleNode> = new Map();
-  constructor(entry: string) {
+  constructor(private resolveFn: (path: string, srcFilePath: string) => Dependency) {}
+  addEntry(entry: string) {
     const entryNode = new ModuleNode(entry);
     this.pathToModule.set(entryNode.filePath, entryNode);
 
     for (const mod of this.pathToModule.values()) {
       mod.deps.forEach(d => {
-        const { absPath, canBundle } = mod.resolveDep(d);
+        const { absPath, canBundle } = this.resolveFn(d, mod.filePath);
         if (!canBundle) { // 无法打包进去的，直接require
           mod.depDict[d] = DIRECT_REQUIRE;
           return;

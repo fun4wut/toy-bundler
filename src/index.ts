@@ -1,10 +1,7 @@
-import { ModuleGraph } from './graph';
-import { genOutputCode } from './runtime/template';
-import fse from 'fs-extra';
-const fileName = process.argv[2];
+import { Bundler } from './bundler';
 
-const graph = new ModuleGraph(fileName);
-
-// console.log(graph)
-const res = genOutputCode(graph.dumpFromTemplate());
-fse.writeFileSync('./playground/bundled.js', res);
+new Bundler({
+  input: './tests/c.js',
+  output: './playground/bundled.js',
+  external: [],
+}).doBundle();
