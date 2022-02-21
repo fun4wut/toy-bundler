@@ -45,6 +45,7 @@ export class Bundler {
             err.code = EXTERNAL_MOD_CODE;
             throw err;
           }
+          return pkg;
         },
       });
       return {
@@ -55,6 +56,7 @@ export class Bundler {
       if (error.code !== EXTERNAL_MOD_CODE) {
         throw error;
       }
+      console.log('not bundled:', path);
       return {
         canBundle: false,
         absPath: '',

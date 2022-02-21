@@ -11,6 +11,8 @@ export function transformToCjs(path: string) {
     const code = fse.readFileSync(path).toString();
     const res = transformSync(code, {
       format: 'cjs',
+      loader: 'ts',
+      target: 'es6'
     });
     return res.code || '';
   } catch (error) {
